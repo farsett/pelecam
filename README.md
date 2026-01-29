@@ -1,1 +1,1 @@
-pip install fastapi uvicorn opencv-python
+pip install fastapi uvicorn opencv-python cv2_enumerate_cameras dotenv
