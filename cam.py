@@ -6,8 +6,15 @@ import time
 import uvicorn
 
 
+DEVICE_ID = 0
 FRAME_RATE = 30
 DELAY = round((1/FRAME_RATE), 2)
+RESIZE_COEF = 2
+QUALITY = 90 # 0-100
+CH_TYPE = 'simple'
+COLOR = 'red'
+_color_code = {'red': (0, 0, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0)}
+THICKNESS = 1
 
 app = FastAPI()
 
@@ -43,21 +50,23 @@ class Crosshair:
         elif self.style == 'dot':
             cv2.circle(frame, (center_x, center_y), 4, self.color, -1)
 
-ch = Crosshair()
+ch = Crosshair(color=_color_code[COLOR], style=CH_TYPE, thickness=THICKNESS)
 
 # Функция захвата видео с камеры в отдельном потоке
 def capture_frames():
     global latest_frame
-    # Используйте 0 для камеры по умолчанию или 1, 2 для USB-камер[citation:3]
-    camera = cv2.VideoCapture(0)
+    camera = cv2.VideoCapture(DEVICE_ID)
     while True:
         success, frame = camera.read()
         if success:
             with lock:
                 # Рисуем прицел
                 ch.draw(frame)
+                # Меняем размер, если необходимо
+                if RESIZE_COEF != 1:
+                    frame = cv2.resize(frame, [int(i * RESIZE_COEF) for i in frame.shape[:2]][::-1])
                 # Конвертируем кадр в формат JPEG
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), QUALITY]
                 _, jpeg_buffer = cv2.imencode('.jpg', frame, encode_param)
                 latest_frame = jpeg_buffer.tobytes()
         time.sleep(DELAY)
