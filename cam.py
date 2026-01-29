@@ -16,7 +16,7 @@ FRAME_RATE = int(os.getenv('FRAME_RATE', 30))
 _delay = round((1/FRAME_RATE), 2)
 RESIZE_COEF = float(os.getenv('RESIZE_COEF', 1))
 QUALITY = int(os.getenv('QUALITY', 90))
-CH_TYPE = os.getenv('CH_TYPE', 'simple')
+CH_STYLE = os.getenv('CH_STYLE', 'simple')
 COLOR = os.getenv('COLOR', 'red')
 _color_code = {'red': (0, 0, 255), 'green': (0, 255, 0), 'blue': (255, 0, 0)}
 THICKNESS = int(os.getenv('THICKNESS', 1))
@@ -25,7 +25,7 @@ class Settings(BaseModel):
     frame_rate: int = Field(30, title="Частота кадров", description="от 1 до 60")
     resize_coef: float = Field(1, title='Коэффициент масштабирования изображения', description="от 0.1 до 5")
     quality: int = Field(90, title="Качество изображения в процентах", description="от 10 до 100")
-    ch_type: str = Field('simple', title="Тип прицела", description="simple, circle, x-circle, dot")
+    ch_style: str = Field('simple', title="Тип прицела", description="simple, circle, x-circle, dot")
     color: str = Field('red', title="Цвет прицела", description="red, green, blue")
     thickness: int = Field(1, title="Толщина прицела", description="от 1 до 10")
 
@@ -67,7 +67,7 @@ class Crosshair:
         elif self.style == 'dot':
             cv2.circle(frame, (center_x, center_y), 4, self.color, -1)
 
-ch = Crosshair(color=_color_code[COLOR], style=CH_TYPE, thickness=THICKNESS)
+ch = Crosshair(color=_color_code[COLOR], style=CH_STYLE, thickness=THICKNESS)
 
 # Функция захвата видео с камеры в отдельном потоке
 def capture_frames():
@@ -103,7 +103,7 @@ def video_feed():
                 if latest_frame is not None:
                     frame_data = latest_frame
             if frame_data:
-                # Формируем ответ для MJPEG потока[citation:6]
+                # Формируем ответ для MJPEG потока
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame_data + b'\r\n')
             time.sleep(_delay)
@@ -143,7 +143,7 @@ def get_available_cams():
         "content": {
             "application/json": {
                 "example": {
-                    "frame_rate": 30, "resize_coef": 1, "quality": 90, "ch_type": "simple", "color": "red", "thickness": 1}
+                    "frame_rate": 30, "resize_coef": 1, "quality": 90, "ch_style": "simple", "color": "red", "thickness": 1}
             }
         }
     }
@@ -154,7 +154,7 @@ def get_settings():
         "frame_rate": FRAME_RATE,
         "resize_coef": RESIZE_COEF,
         "quality": QUALITY,
-        "ch_type": CH_TYPE,
+        "ch_style": CH_STYLE,
         "color": COLOR,
         "thickness": THICKNESS,
     }
@@ -182,13 +182,13 @@ def set_settings(settings: Settings):
     if not 10 <= settings.quality <= 100:
         return JSONResponse(content={"message": "Отправьте значение quality от 0.1 до 5"}, status_code=400,
                             headers={"Content-Type": "application/json"})
-    if settings.ch_type not in ['simple', 'circle', 'x-circle', 'dot']:
+    if settings.ch_style not in ['simple', 'circle', 'x-circle', 'dot']:
         return JSONResponse(content={"message": "Некорректный тип прицела"}, status_code=400,
                             headers={"Content-Type": "application/json"})
     if settings.color not in ['red', 'green', 'blue']:
         return JSONResponse(content={"message": "Некорректный цвет прицела"}, status_code=400,
                             headers={"Content-Type": "application/json"})
-    if not 1 <= settings.thickness <=10 :
+    if not 1 <= settings.thickness <=10:
         return JSONResponse(content={"message": "Отправьте значение thickness от 1 до 10"}, status_code=400,
                             headers={"Content-Type": "application/json"})
 
@@ -198,7 +198,7 @@ def set_settings(settings: Settings):
     _delay = round((1/settings.frame_rate), 2)
     RESIZE_COEF = settings.resize_coef
     QUALITY = settings.quality
-    ch.style = settings.ch_type
+    ch.style = settings.ch_style
     ch.color = _color_code[settings.color]
     ch.thickness = settings.thickness
 
@@ -207,7 +207,7 @@ def set_settings(settings: Settings):
     dotenv.set_key(dotenv_file, 'FRAME_RATE', str(settings.frame_rate))
     dotenv.set_key(dotenv_file, 'RESIZE_COEF', str(settings.resize_coef))
     dotenv.set_key(dotenv_file, 'QUALITY', str(settings.quality))
-    dotenv.set_key(dotenv_file, 'CH_TYPE', settings.ch_type)
+    dotenv.set_key(dotenv_file, 'CH_STYLE', settings.ch_style)
     dotenv.set_key(dotenv_file, 'COLOR', settings.color)
     dotenv.set_key(dotenv_file, 'THICKNESS', str(settings.thickness))
 
