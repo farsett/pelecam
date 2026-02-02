@@ -57,7 +57,7 @@ class Crosshair:
             cv2.line(frame, (0, center_y), (frame.shape[1], center_y),
                      self.color, self.thickness)
         elif self.style == 'circle':
-            cv2.circle(frame, (center_x, center_y), 10, self.color, self.thickness)
+            cv2.circle(frame, (center_x, center_y), self.thickness*3, self.color, self.thickness)
         elif self.style == 'x-circle':
             cv2.circle(frame, (center_x, center_y), 15, self.color, self.thickness)
             cv2.line(frame, (center_x - 20, center_y), (center_x + 20, center_y),
@@ -65,7 +65,7 @@ class Crosshair:
             cv2.line(frame, (center_x, center_y - 20), (center_x, center_y + 20),
                      self.color, self.thickness)
         elif self.style == 'dot':
-            cv2.circle(frame, (center_x, center_y), 4, self.color, -1)
+            cv2.circle(frame, (center_x, center_y), self.thickness, self.color, -1)
 
 ch = Crosshair(color=_color_code[COLOR], style=CH_STYLE, thickness=THICKNESS)
 
