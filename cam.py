@@ -169,7 +169,11 @@ def get_settings():
         }
     },
     400: {
-        "message": "Возвращает сообщение о некорректном значении"
+        "description": "Возвращает сообщение о некорректном значении",
+        "content": {
+            "application/json": {
+                "example": {'message': "Некорректный тип прицела"}}
+            }
     }
 })
 def set_settings(settings: Settings):
