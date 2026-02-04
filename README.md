@@ -14,12 +14,13 @@
    source /camenv/bin/activate
    pip install fastapi uvicorn opencv-python cv2_enumerate_cameras dotenv
    ```
-4. Сделайте `auto_start.sh` исполняемым и проверьте работоспособность
+4. Отредактируйте 3-ю строчку `auto_start.sh`, указав в `API_PATH` абсолютный путь к файлам в папке `/pelecam`
+5. Сделайте `auto_start.sh` исполняемым и проверьте работоспособность
    ```
    sudo chmod +x auto_start.sh
    ./auto_start.sh
    ```
-5. Добавьте cron-задачу на автозапуск
+6. Добавьте cron-задачу на автозапуск
    ```
    sudo crontab -e
    ```
